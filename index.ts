@@ -1,5 +1,6 @@
 import * as DiscordJS from "discord.js";
 import * as env from "dotenv";
+import express from 'express';
 import { Commands } from "./interfaces/main";
 import {
   createAudioPlayer,
@@ -243,5 +244,16 @@ class War {
       .then(() => console.log("All waves finished"));
   }
 }
+const app = express();
 
-client.login(process.env.TOKEN);
+const PORT = process.env.PORT
+
+app.get('/', (req, res) => {
+  res.send('Bot is running.')
+})
+
+app.listen(PORT, () => {
+  client.login(process.env.TOKEN);
+  console.log(`Example app listening on port ${PORT}`)
+})
+
