@@ -1,6 +1,6 @@
 import * as DiscordJS from "discord.js";
 import * as env from "dotenv";
-import express from 'express';
+import express from "express";
 import { Commands } from "./interfaces/main";
 import {
   createAudioPlayer,
@@ -30,94 +30,6 @@ const client = createClient();
 const player = createAudioPlayer();
 const guildId = process.env.GUILD_ID || "";
 const channelId = process.env.CHANNEL_ID || "";
-
-client.on("ready", () => {
-  console.log("Bot is ready!");
-
-  const guild = client.guilds.cache.get(guildId);
-
-  let commands;
-
-  if (!guild) {
-    commands = client.application?.commands;
-  }
-
-  commands = guild?.commands;
-
-  commands?.create({
-    name: "war",
-    defaultPermission: true,
-    description: "Inicia uma guerra e os timers de respawn das mesmas.",
-    options: [
-      {
-        name: "time",
-        description: "Horário para a guerra ser agendada",
-        type: "STRING",
-      },
-    ],
-  });
-});
-
-client.on("messageCreate", (message) => {
-  console.log("message sent:", message.content);
-});
-
-client.on("interactionCreate", (interaction) => {
-  try {
-    if (!interaction.isCommand()) {
-      return;
-    }
-
-    const { commandName, options } = interaction;
-
-    if (commandName === Commands.WAR) {
-      const time = options.getString("time");
-      const guild = client.guilds.cache.get(guildId);
-
-      if (!guild) {
-        return;
-      }
-
-      try {
-        console.log("Starting war.");
-        const [hours, minutes] = (time && time?.split(":")) || [];
-
-        const war = new War();
-
-        if (!hours || !minutes) {
-          war.start();
-          interaction.reply({
-            content: `Guerra iniciando agora!`,
-            ephemeral: false,
-          });
-        }
-
-        const task = nodeCron.schedule(
-          `${minutes} ${hours} * * *`,
-          () => {
-            war.start();
-            task.stop();
-          },
-          {
-            scheduled: true,
-            timezone: "America/Sao_Paulo",
-          }
-        );
-
-        task.start();
-
-        interaction.reply({
-          content: `Guerra agendada com sucesso para ${hours}:${minutes} de hoje.`,
-          ephemeral: false,
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  } catch (err) {
-    console.log(err);
-  }
-});
 
 class War {
   player: AudioPlayer;
@@ -246,14 +158,101 @@ class War {
 }
 const app = express();
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT;
 
-app.get('/', (req, res) => {
-  res.send('Bot is running!')
-})
+app.get("/", (req, res) => {
+  res.send("Bot is running!");
+});
 
 app.listen(PORT, () => {
   client.login(process.env.TOKEN);
-  console.log(`Example app listening on port ${PORT}`)
-})
+  console.log(`Example app listening on port ${PORT}`);
 
+  client.on("ready", () => {
+    console.log("Bot is ready!");
+
+    const guild = client.guilds.cache.get(guildId);
+
+    let commands;
+
+    if (!guild) {
+      commands = client.application?.commands;
+    }
+
+    commands = guild?.commands;
+
+    commands?.create({
+      name: "war",
+      defaultPermission: true,
+      description: "Inicia uma guerra e os timers de respawn das mesmas.",
+      options: [
+        {
+          name: "time",
+          description: "Horário para a guerra ser agendada",
+          type: "STRING",
+        },
+      ],
+    });
+  });
+
+  client.on("messageCreate", (message) => {
+    console.log("message sent:", message.content);
+  });
+
+  client.on("interactionCreate", (interaction) => {
+    try {
+      if (!interaction.isCommand()) {
+        return;
+      }
+
+      const { commandName, options } = interaction;
+
+      if (commandName === Commands.WAR) {
+        const time = options.getString("time");
+        const guild = client.guilds.cache.get(guildId);
+
+        if (!guild) {
+          return;
+        }
+
+        try {
+          console.log("Starting war.");
+          const [hours, minutes] = (time && time?.split(":")) || [];
+
+          const war = new War();
+
+          if (!hours || !minutes) {
+            war.start();
+            interaction.reply({
+              content: `Guerra iniciando agora!`,
+              ephemeral: false,
+            });
+          }
+
+          const task = nodeCron.schedule(
+            `${minutes} ${hours} * * *`,
+            () => {
+              war.start();
+              task.stop();
+            },
+            {
+              scheduled: true,
+              timezone: "America/Sao_Paulo",
+            }
+          );
+
+          task.start();
+
+          interaction.reply({
+            content: `Guerra agendada com sucesso para ${hours}:${minutes} de hoje.`,
+            ephemeral: false,
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  });
+});
