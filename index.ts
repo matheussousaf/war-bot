@@ -192,7 +192,7 @@ app.listen(PORT, () => {
     commands?.create({
       name: "war",
       defaultPermission: true,
-      description: "Inicia uma guerra e faz a contagem dos timers de respawn.",
+      description: "Inicia uma guerra e faz a contagem dos timers das waves de respawn.",
       options: [
         {
           name: "time",
