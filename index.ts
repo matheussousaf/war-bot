@@ -1,5 +1,5 @@
-import DiscordJS from "discord.js";
-import env from "dotenv";
+import * as DiscordJS from "discord.js";
+import * as env from "dotenv";
 import { Commands } from "./interfaces/main";
 import {
   createAudioPlayer,
