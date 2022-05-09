@@ -125,7 +125,7 @@ class War {
             );
 
             this.player.play(audio_15_seconds);
-            console.log("10 SEGUNDOS PARA O RESPAWN");
+            console.log("15 SEGUNDOS PARA O RESPAWN");
           }
 
           if (timeLeft === 5) {
@@ -233,7 +233,7 @@ app.listen(PORT, () => {
             war.start();
             interaction.reply({
               content: `Guerra iniciando agora!`,
-              ephemeral: false,
+              ephemeral: true,
             });
           }
 
@@ -253,7 +253,7 @@ app.listen(PORT, () => {
 
           interaction.reply({
             content: `Guerra agendada com sucesso para ${hours}:${minutes} de hoje.`,
-            ephemeral: false,
+            ephemeral: true,
           });
         } catch (err) {
           console.log(err);
