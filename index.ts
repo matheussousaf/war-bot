@@ -42,7 +42,7 @@ class War {
     });
 
     player.on(AudioPlayerStatus.Playing, () => {
-      console.log("The audio player has started playing!!");
+      console.log("The audio player has started playing!");
     });
 
     player.on("error", (error) => {
