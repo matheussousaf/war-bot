@@ -169,7 +169,7 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 
   client.on("ready", () => {
-    console.log("Bot is ready!");
+    console.log("Bot is ready!!");
 
     const guild = client.guilds.cache.get(guildId);
 
