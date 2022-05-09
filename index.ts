@@ -9,6 +9,7 @@ import {
   AudioPlayerStatus,
   joinVoiceChannel,
   AudioPlayer,
+  VoiceConnectionStatus,
 } from "@discordjs/voice";
 import nodeCron from "node-cron";
 
@@ -63,6 +64,13 @@ class War {
 
     const subscription = connection.subscribe(this.player);
 
+    connection.on("stateChange", (state) => {
+      if (state.status === VoiceConnectionStatus.Destroyed) {
+        subscription?.unsubscribe();
+        connection.disconnect();
+      }
+    });
+
     this.respawnWaves();
 
     const task = nodeCron.schedule("*/30 * * * *", () => {
@@ -113,7 +121,7 @@ class War {
 
           if (timeLeft === 15) {
             const audio_15_seconds = createAudioResource(
-              "/home/matheus/Development/nw/nw-war-bot/audio/15_seconds_to_respawn_PTBR.mp3"
+              `${__dirname}/audio/15_seconds_to_respawn_PTBR.mp3`
             );
 
             this.player.play(audio_15_seconds);
@@ -122,7 +130,7 @@ class War {
 
           if (timeLeft === 5) {
             const audio_5_seconds = createAudioResource(
-              "/home/matheus/Development/nw/nw-war-bot/audio/5_seconds_to_respawn_PTBR.mp3"
+              `${__dirname}/audio/5_seconds_to_respawn_PTBR.mp3`
             );
 
             this.player.play(audio_5_seconds);
@@ -132,7 +140,7 @@ class War {
           if (timeLeft === 0) {
             console.log("RESPAWNOU");
             const respawn = createAudioResource(
-              "/home/matheus/Development/nw/nw-war-bot/audio/respawn.mp3"
+              `${__dirname}/audio/respawn.mp3`
             );
 
             this.player.play(respawn);
