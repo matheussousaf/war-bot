@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "node index.js",
+    "start": "node build/index.js",
     "dev": "nodemon index.ts"
   },
   "dependencies": {
