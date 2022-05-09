@@ -1,6 +1,5 @@
 import * as DiscordJS from "discord.js";
 import * as env from "dotenv";
-import express from "express";
 import { Commands } from "./interfaces/main";
 import {
   createAudioPlayer,
@@ -164,103 +163,93 @@ class War {
       .then(() => console.log("All waves finished"));
   }
 }
-const app = express();
+client.login(process.env.TOKEN);
 
-const PORT = process.env.PORT;
+client.on("ready", () => {
+  console.log("Bot is ready!!");
 
-app.get("/", (req, res) => {
-  res.send("Bot is running!");
+  const guild = client.guilds.cache.get(guildId);
+
+  let commands;
+
+  if (!guild) {
+    commands = client.application?.commands;
+  }
+
+  commands = guild?.commands;
+
+  commands?.create({
+    name: "war",
+    defaultPermission: true,
+    description:
+      "Inicia uma guerra e faz a contagem dos timers das waves de respawn.",
+    options: [
+      {
+        name: "time",
+        description: "Horário para a guerra ser agendada",
+        type: "STRING",
+      },
+    ],
+  });
 });
 
-app.listen(PORT, () => {
-  client.login(process.env.TOKEN);
-  console.log(`Example app listening on port ${PORT}`);
+client.on("messageCreate", (message) => {
+  console.log("message sent:", message.content);
+});
 
-  client.on("ready", () => {
-    console.log("Bot is ready!!");
-
-    const guild = client.guilds.cache.get(guildId);
-
-    let commands;
-
-    if (!guild) {
-      commands = client.application?.commands;
+client.on("interactionCreate", (interaction) => {
+  try {
+    if (!interaction.isCommand()) {
+      return;
     }
 
-    commands = guild?.commands;
+    const { commandName, options } = interaction;
 
-    commands?.create({
-      name: "war",
-      defaultPermission: true,
-      description: "Inicia uma guerra e faz a contagem dos timers das waves de respawn.",
-      options: [
-        {
-          name: "time",
-          description: "Horário para a guerra ser agendada",
-          type: "STRING",
-        },
-      ],
-    });
-  });
+    if (commandName === Commands.WAR) {
+      const time = options.getString("time");
+      const guild = client.guilds.cache.get(guildId);
 
-  client.on("messageCreate", (message) => {
-    console.log("message sent:", message.content);
-  });
-
-  client.on("interactionCreate", (interaction) => {
-    try {
-      if (!interaction.isCommand()) {
+      if (!guild) {
         return;
       }
 
-      const { commandName, options } = interaction;
+      try {
+        console.log("Starting war.");
+        const [hours, minutes] = (time && time?.split(":")) || [];
 
-      if (commandName === Commands.WAR) {
-        const time = options.getString("time");
-        const guild = client.guilds.cache.get(guildId);
+        const war = new War();
 
-        if (!guild) {
-          return;
-        }
-
-        try {
-          console.log("Starting war.");
-          const [hours, minutes] = (time && time?.split(":")) || [];
-
-          const war = new War();
-
-          if (!hours || !minutes) {
-            war.start();
-            interaction.reply({
-              content: `Guerra iniciando agora!`,
-              ephemeral: true,
-            });
-          }
-
-          const task = nodeCron.schedule(
-            `${minutes} ${hours} * * *`,
-            () => {
-              war.start();
-              task.stop();
-            },
-            {
-              scheduled: true,
-              timezone: "America/Sao_Paulo",
-            }
-          );
-
-          task.start();
-
+        if (!hours || !minutes) {
+          war.start();
           interaction.reply({
-            content: `Guerra agendada com sucesso para ${hours}:${minutes} de hoje.`,
+            content: `Guerra iniciando agora!`,
             ephemeral: true,
           });
-        } catch (err) {
-          console.log(err);
         }
+
+        const task = nodeCron.schedule(
+          `${minutes} ${hours} * * *`,
+          () => {
+            war.start();
+            task.stop();
+          },
+          {
+            scheduled: true,
+            timezone: "America/Sao_Paulo",
+          }
+        );
+
+        task.start();
+
+        interaction.reply({
+          content: `Guerra agendada com sucesso para ${hours}:${minutes} de hoje.`,
+          ephemeral: true,
+        });
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
     }
-  });
+  } catch (err) {
+    console.log(err);
+  }
 });
