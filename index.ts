@@ -249,7 +249,7 @@ const app = express();
 const PORT = process.env.PORT
 
 app.get('/', (req, res) => {
-  res.send('Bot is running.')
+  res.send('Bot is running!')
 })
 
 app.listen(PORT, () => {
