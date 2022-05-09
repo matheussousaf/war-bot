@@ -1,0 +1,22 @@
+{
+  "name": "nw-war-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon index.ts"
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.9.0",
+    "date-fns": "^2.28.0",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "node-cron": "^3.0.0",
+    "nodemon": "^2.0.16",
+    "sodium": "^3.0.2",
+    "typescript": "^4.6.4"
+  },
+  "devDependencies": {
+    "@types/node-cron": "^3.0.1"
+  }
+}
